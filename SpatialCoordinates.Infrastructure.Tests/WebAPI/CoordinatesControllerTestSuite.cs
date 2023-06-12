@@ -1,6 +1,7 @@
 ﻿using Moq;
+using SpatialCoordinates.Domain.CustomExceptions;
 using SpatialCoordinates.Domain.DomainEntities;
-using SpatialCoordinates.Domain.RepositoryContracts;
+using SpatialCoordinates.Domain.ServiceContracts;
 using SpatialCoordinates.Domain.ServiceImplementations;
 using SpatialCoordinates.Infrastructure.Data.RepositoryImplementations;
 using SpatialCoordinates.WebAPI.Controllers;
@@ -13,16 +14,34 @@ namespace SpatialCoordinates.Infrastructure.Tests.WebAPI
 {
     public class CoordinatesControllerTestSuite
     {
-        #region Register
+        #region private controller initializers
+        private CoordinatesController InitController()
+        {
+            CoordinatesController controller =
+                new CoordinatesController(
+                    new CoordinatesService(
+                        new CoordinatesRepository()));
+
+            return controller;
+        }
+
+        private CoordinatesController InitControllerWithMockedService()
+        {
+            Mock<ICoordinatesService> serviceMock = new Mock<ICoordinatesService>();
+            serviceMock.Setup(x => x.Register(It.IsAny<Coordinates>()));
+
+            ICoordinatesService mockedService = serviceMock.Object;
+
+            return new CoordinatesController(mockedService);
+        }
+        #endregion
+
+        #region Register action tests
         [Fact]
         public void IntegrationTest_Register_InputValid_ReturnsOkResult()
         {
             // Arrange
-            CoordinatesController controller = new CoordinatesController(
-                new CoordinatesService(
-                    new CoordinatesRepository()
-                    ));
-
+            CoordinatesController controller = InitController();
             List<decimal> values = new List<decimal> { 0, 0, 0 };
 
             // Act
@@ -35,17 +54,54 @@ namespace SpatialCoordinates.Infrastructure.Tests.WebAPI
         [Fact]
         public void UnitTest_Register_InputValid_ReturnsOkResult()
         {
-            // TODO smilla -> complete code with correct Mocking
             // Arrange
-            Mock<CoordinatesService> serviceMock = new Mock<CoordinatesService>();
-            serviceMock.Setup(x => x.Register(new Coordinates()
-            {
-                CoordX = 0,
-                CoordY = 0,
-                CoordZ = 0
-            }));
+            CoordinatesController controller = InitControllerWithMockedService();
+            List<decimal> values = new List<decimal> { 0, 0, 0 };
 
-            CoordinatesService mockedService = serviceMock.Object;
+            // Act
+            IHttpActionResult result = controller.Register(values);
+
+            // Assert
+            Assert.IsType<OkResult>(result);
+        }
+
+        [Fact]
+        public void UnitTest_Register_InputSizeZero_ReturnsBadRequestResult()
+        {
+            // Arrange
+            CoordinatesController controller = InitControllerWithMockedService();
+            List<decimal> values = new List<decimal>();
+
+            // Act
+            IHttpActionResult result = controller.Register(values);
+
+            // Assert
+            Assert.IsType<BadRequestErrorMessageResult>(result);
+        }
+
+        [Fact]
+        public void UnitTest_Register_InputSizeMoreThanThree_ReturnsBadRequestResult()
+        {
+            // Arrange
+            CoordinatesController controller = InitControllerWithMockedService();
+            List<decimal> values = new List<decimal> { 0, 0, 0, 0, 0, 0, 0 };
+
+            // Act
+            IHttpActionResult result = controller.Register(values);
+
+            // Assert
+            Assert.IsType<BadRequestErrorMessageResult>(result);
+        }
+
+        [Fact]
+        public void UnitTest_Register_InputValid_InvalidCoordXExceptionCaught_ReturnsBadRequest()
+        {
+            // Arrange
+            Mock<ICoordinatesService> serviceMock = new Mock<ICoordinatesService>();
+            serviceMock.Setup(x => x.Register(It.IsAny<Coordinates>())).Throws<InvalidCoordXException>();
+
+            ICoordinatesService mockedService = serviceMock.Object;
+
             CoordinatesController controller = new CoordinatesController(mockedService);
 
             List<decimal> values = new List<decimal> { 0, 0, 0 };
@@ -54,7 +110,27 @@ namespace SpatialCoordinates.Infrastructure.Tests.WebAPI
             IHttpActionResult result = controller.Register(values);
 
             // Assert
-            Assert.IsType<OkResult>(result);
+            Assert.IsType<BadRequestErrorMessageResult>(result);
+        }
+
+        [Fact]
+        public void UnitTest_Register_InputValid_CannotSaveDataExceptionCaught_ReturnsBadRequest()
+        {
+            // Arrange
+            Mock<ICoordinatesService> serviceMock = new Mock<ICoordinatesService>();
+            serviceMock.Setup(x => x.Register(It.IsAny<Coordinates>())).Throws<CannotSaveDataException>();
+
+            ICoordinatesService mockedService = serviceMock.Object;
+
+            CoordinatesController controller = new CoordinatesController(mockedService);
+
+            List<decimal> values = new List<decimal> { 0, 0, 0 };
+
+            // Act
+            IHttpActionResult result = controller.Register(values);
+
+            // Assert
+            Assert.IsType<BadRequestErrorMessageResult>(result);
         }
         #endregion
     }

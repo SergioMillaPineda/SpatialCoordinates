@@ -1,9 +1,5 @@
 ﻿using SpatialCoordinates.Domain.ServiceImplementations;
 using SpatialCoordinates.Infrastructure.Data.RepositoryImplementations;
-using SpatialCoordinates.WebAPI.Controllers;
-using System.Collections.Generic;
-using System.Web.Http.Results;
-using System.Web.Http;
 using Xunit;
 using SpatialCoordinates.Domain.DomainEntities;
 

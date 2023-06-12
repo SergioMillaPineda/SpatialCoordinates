@@ -49,15 +49,9 @@ namespace SpatialCoordinates.WebAPI.Controllers
             {
                 return BadRequest($"Some problem found in X coordinate: {ex.Message}");
             }
-
             catch (CannotSaveDataException ex)
             {
                 return BadRequest($"Some error occured while trying to save data: {ex.Message}");
-            }
-
-            catch (Exception)
-            {
-                return BadRequest($"Some unexpected error occured");
             }
         }
     }
