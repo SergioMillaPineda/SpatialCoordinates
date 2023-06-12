@@ -40,16 +40,46 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core">
+      <Version>5.2.9</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="Moq">
+      <Version>4.18.4</Version>
+    </PackageReference>
     <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.extensibility.core">
+      <Version>2.4.2</Version>
+    </PackageReference>
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <PackageReference Include="coverlet.collector" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\CoordinatesServiceTestSuite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WebAPI\CoordinatesControllerTestSuite.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="NewFolder1\" />
+    <Folder Include="Infrastructure.Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SpatialCoordinates.Domain\SpatialCoordinates.Domain.csproj">
+      <Project>{5ED946A4-B7CF-4692-B3ED-C13645BDC7E9}</Project>
+      <Name>SpatialCoordinates.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SpatialCoordinates.Infrastructure.Data\SpatialCoordinates.Infrastructure.Data.csproj">
+      <Project>{68D50900-1044-451A-9B8B-D87D4626659B}</Project>
+      <Name>SpatialCoordinates.Infrastructure.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SpatialCoordinates.WebAPI\SpatialCoordinates.WebAPI.csproj">
+      <Project>{BB3CCA46-23F9-45DA-A33C-BBC5242E0E6D}</Project>
+      <Name>SpatialCoordinates.WebAPI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="LocalFiles\Coordinates.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
